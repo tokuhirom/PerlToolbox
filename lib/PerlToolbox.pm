@@ -30,6 +30,12 @@ sub db {
     $c->{db};
 }
 
+{
+    use PerlToolbox::MetaCPAN;
+    my $metacpan = PerlToolbox::MetaCPAN->new();
+    sub metacpan { $metacpan }
+}
+
 1;
 __END__
 

@@ -3,16 +3,23 @@ use strict;
 use warnings;
 use utf8;
 use Amon2::Web::Dispatcher::RouterBoom;
+use PerlToolbox::Data;
+use PerlToolbox::MetaCPAN;
 
-any '/' => sub {
+get '/' => sub {
     my ($c) = @_;
-    return $c->render('index.tx');
+    return $c->render('index.tx', {
+        categories => [PerlToolbox::Set::Category->all()],
+    });
 };
 
-post '/account/logout' => sub {
-    my ($c) = @_;
-    $c->session->expire();
-    return $c->redirect('/');
+any '/category/{name:.+}' => sub {
+    my ($c, $args) = @_;
+
+    my $category = PerlToolbox::Set::Category->retrieve($args->{name});
+    return $c->render('category.tx', {
+        category => $category,
+    });
 };
 
 1;

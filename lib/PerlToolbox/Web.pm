@@ -8,6 +8,7 @@ use File::Spec;
 # dispatcher
 use PerlToolbox::Web::Dispatcher;
 sub dispatch {
+    warn $_[0]->req->env->{PATH_INFO};
     return (PerlToolbox::Web::Dispatcher->dispatch($_[0]) or die "response is not generated");
 }
 

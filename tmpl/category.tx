@@ -1,0 +1,64 @@
+: cascade "include/layout.tx" { title => $category.name ~ " - The Perl Toolbox" }
+
+: override content -> {
+
+<h1><: $category.name :></h1>
+
+<hr />
+
+<div class="row">
+: for $category.modules -> $module {
+    <div class="category clearfix">
+        <h2><a href="https://metacpan.org/release/<: $module.name :>"><: $module.name :></a></h2>
+        <div class="clearfix">
+        <: for $module.favs -> $user { :>
+            <div class="user clearfix user-country-<: $user.country :>">
+                <img class="gravatar" src="<: $user.gravatar_url :>">
+                <div class="user-name"><: $user.pauseid :></div>
+                <: if $user.country { :>
+                    <img src="https://metacpan.org/static/images/flag/<: $user.country | lc :>.png" class="country-flag" data-country="<: $user.country :>">
+                <: } :>
+            </div>
+        <: } :>
+        </div>
+        <div class="anonymous"><p>And <: $module.faved_anonymous() :> anonymous users.</p></div>
+    </div>
+: }
+</div>
+
+<hr  class="clear-both" />
+
+<style>
+    .gravatar {
+        width: 32px;
+        height: 32px;
+        display: block;
+        border-radius: 4px;
+        border: 1px solid #cccccc;
+        float: left;
+    }
+    .user-name {
+        float: left;
+    }
+    .user {
+        width: 150px;
+        float: left;
+        padding: 2px;
+    }
+    .active {
+        background-color: #ffcc33;
+    }
+    .anonymous {
+        color: gray;
+    }
+</style>
+
+<script>
+    $('.country-flag').click(function () {
+        var country = $(this).data('country');
+        $('.user').removeClass('active');
+        $('.user-country-' + country).addClass('active');
+    });
+</script>
+
+: }

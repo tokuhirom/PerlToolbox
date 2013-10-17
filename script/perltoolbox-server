@@ -23,6 +23,7 @@ my $app = builder {
         path => qr{^(?:/robots\.txt|/favicon\.ico)$},
         root => File::Spec->catdir(dirname(__FILE__), '..', 'static');
     enable 'Plack::Middleware::ReverseProxy';
+    enable 'Plack::Middleware::AccessLog';
 
     # If you want to run the app on multiple servers,
     # you need to use Plack::Sesion::Store::DBI or ::Store::Cache.
@@ -40,9 +41,9 @@ unless (caller) {
     my $port        = 5000;
     my $host        = '127.0.0.1';
     my $max_workers = 4;
+    my $loader;
 
     require Getopt::Long;
-    require Plack::Loader;
     my $p = Getopt::Long::Parser->new(
         config => [qw(posix_default no_ignore_case auto_help)]
     );
@@ -51,11 +52,17 @@ unless (caller) {
         'host=s'      => \$host,
         'max-workers' => \$max_workers,
         'version!'    => \my $version,
+        'r|reload'     => sub { $loader ||= do { require Plack::Loader::Restarter; Plack::Loader::Restarter->new() } },
+        'R|Reload=s'   => sub { $loader ||= do { require Plack::Loader::Restarter; Plack::Loader::Restarter->new() };  $loader->watch(split ",", $_[1]) },
         'c|config=s'  => \my $config_file,
     );
     if ($version) {
         print "PerlToolbox: $PerlToolbox::VERSION\n";
         exit 0;
+    }
+    if (!$loader) {
+        require Plack::Loader;
+        $loader = Plack::Loader->new();
     }
     if ($config_file) {
         my $config = do $config_file;
@@ -70,11 +77,14 @@ unless (caller) {
 
     print "PerlToolbox: http://${host}:${port}/\n";
 
-    my $loader = Plack::Loader->load('Starlet',
+    my $server = $loader->load('Starlet',
         port        => $port,
         host        => $host,
         max_workers => $max_workers,
     );
-    return $loader->run($app);
+    $loader->preload_app(sub { warn "LOAD"; warn __FILE__; Plack::Util::load_psgi(__FILE__) });
+    $loader->run($server);
+    exit 0;
 }
+warn "Return app";
 return $app;

@@ -1,7 +1,7 @@
 requires 'Amon2', '5.04';
 requires 'DBD::SQLite', '1.33';
 requires 'HTML::FillInForm::Lite', '1.11';
-requires 'JSON', '2.50';
+requires 'JSON::XS', '2.34';
 requires 'Module::Functions', '2';
 requires 'Plack::Middleware::ReverseProxy', '0.09';
 requires 'Plack::Middleware::Session';
@@ -13,6 +13,10 @@ requires 'Test::WWW::Mechanize::PSGI';
 requires 'Text::Xslate', '2.0009';
 requires 'Time::Piece', '1.20';
 requires 'perl', '5.010_001';
+requires 'MetaCPAN::API';
+requires 'mop';
+requires 'Furl';
+requires 'Log::Minimal';
 
 on configure => sub {
     requires 'Module::Build', '0.38';
@@ -21,4 +25,5 @@ on configure => sub {
 
 on test => sub {
     requires 'Test::More', '0.98';
+    requires 'Test::Power';
 };
